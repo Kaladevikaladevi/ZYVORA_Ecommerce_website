@@ -1,0 +1,44 @@
+.checkout__title { color: var(--tyrian); font-size: clamp(28px, 4vw, 40px); margin-bottom: 28px; }
+.checkout { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
+.checkout__main { display: flex; flex-direction: column; gap: 22px; }
+.checkout__card { padding: 26px; }
+.checkout__card h3 { color: var(--ink); font-size: 20px; margin-bottom: 20px; }
+
+.checkout__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.checkout__full { grid-column: 1 / -1; }
+.checkout .field { margin-bottom: 16px; }
+
+.checkout__pay {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1.5px solid var(--tyrian);
+  border-radius: var(--radius-sm);
+  background: var(--mist);
+  cursor: pointer;
+}
+.checkout__pay svg { font-size: 24px; color: var(--tyrian); }
+.checkout__pay strong { display: block; color: var(--ink); }
+.checkout__pay span { font-size: 13px; color: var(--muted); }
+.checkout__pay input { accent-color: var(--tyrian); width: 18px; height: 18px; }
+
+.checkout__summary { padding: 24px; position: sticky; top: 96px; }
+.checkout__summary h3 { color: var(--ink); font-size: 20px; margin-bottom: 18px; }
+.checkout__items { display: flex; flex-direction: column; gap: 14px; max-height: 280px; overflow-y: auto; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.checkout__item { display: flex; align-items: center; gap: 12px; }
+.checkout__item img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--mist); }
+.checkout__item div { flex: 1; display: flex; flex-direction: column; }
+.checkout__item strong { font-size: 14px; color: var(--ink); }
+.checkout__item span { font-size: 12px; color: var(--muted); }
+.checkout__item-price { font-weight: 600; color: var(--tyrian); font-size: 14px; }
+
+.checkout__row { display: flex; justify-content: space-between; padding: 8px 0; color: var(--muted); }
+.checkout__row--total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 14px; font-weight: 700; font-size: 19px; color: var(--ink); }
+.checkout__row--total span:last-child { color: var(--tyrian); }
+.checkout__summary .btn { margin-top: 18px; }
+.checkout__back { display: block; text-align: center; margin-top: 12px; color: var(--accent-2); font-size: 14px; }
+.checkout__back:hover { text-decoration: underline; }
+
+@media (max-width: 900px) { .checkout { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .checkout__grid { grid-template-columns: 1fr; } }

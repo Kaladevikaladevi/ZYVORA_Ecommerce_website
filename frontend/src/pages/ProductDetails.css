@@ -1,0 +1,111 @@
+.pd-breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
+.pd-breadcrumb a:hover { color: var(--tyrian); }
+.pd-breadcrumb span { color: var(--ink); }
+
+.pd { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+
+/* Gallery */
+.pd__main {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--mist);
+  cursor: zoom-in;
+  border: 1px solid var(--line);
+}
+.pd__main img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s ease; }
+.pd__badge { position: absolute; top: 16px; left: 16px; }
+.pd__thumbs { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.pd__thumb {
+  width: 78px;
+  height: 78px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  transition: border-color 0.2s;
+}
+.pd__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.pd__thumb.is-active { border-color: var(--tyrian); }
+
+/* Info */
+.pd__cat { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-3); font-weight: 600; }
+.pd__info h1 { font-size: clamp(28px, 4vw, 40px); margin: 8px 0 14px; color: var(--ink); }
+.pd__rating { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+
+.pd__price { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.pd__price .now { font-size: 34px; font-weight: 700; color: var(--tyrian); font-family: var(--font-serif); }
+.pd__price .was { font-size: 18px; color: var(--muted-2); text-decoration: line-through; }
+.pd__price .save { background: var(--mist); color: var(--success); font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+
+.pd__desc { color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+
+.pd__meta {
+  display: flex;
+  gap: 40px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+.pd__meta span { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.pd__meta strong { font-size: 16px; color: var(--ink); }
+.text-success { color: var(--success) !important; }
+.text-danger { color: var(--danger) !important; }
+
+.pd__qty { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+.pd__qty > span { font-size: 14px; font-weight: 600; }
+.qty-stepper { display: flex; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
+.qty-stepper button {
+  width: 42px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--tyrian);
+  transition: background 0.2s;
+}
+.qty-stepper button:hover { background: var(--mist); }
+.qty-stepper span { width: 52px; text-align: center; font-weight: 600; font-size: 16px; }
+
+.pd__actions { display: flex; gap: 12px; margin-bottom: 28px; }
+.pd__add { flex: 1; }
+.pd__wish {
+  width: 52px;
+  height: 52px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  color: var(--tyrian);
+  font-size: 18px;
+  transition: all 0.25s;
+}
+.pd__wish:hover { border-color: var(--tyrian); }
+.pd__wish.is-active { background: var(--tyrian); color: #fff; border-color: var(--tyrian); }
+
+.pd__perks { display: grid; gap: 12px; }
+.pd__perks li { display: flex; align-items: center; gap: 12px; color: var(--ink); font-size: 14.5px; }
+.pd__perks svg { color: var(--accent-3); flex-shrink: 0; }
+
+@media (max-width: 880px) {
+  .pd { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 480px) {
+  .pd__actions { flex-wrap: wrap; }
+  .pd__add { flex: 1 1 100%; }
+  .pd__price .now { font-size: 28px; }
+  .pd__info h1 { font-size: 24px; }
+  .pd__meta { gap: 24px; flex-wrap: wrap; }
+  .pd__thumb { width: 64px; height: 64px; }
+  /* On touch screens, disable the zoom-scale so the image never overflows. */
+  .pd__main img { transform: none !important; }
+  .pd__main { cursor: default; }
+}
+@media (max-width: 360px) {
+  .pd-breadcrumb { font-size: 12px; margin-bottom: 18px; }
+  .pd__info h1 { font-size: 21px; }
+  .pd__price .now { font-size: 24px; }
+  .pd__thumb { width: 56px; height: 56px; }
+  .pd__perks li { font-size: 13.5px; gap: 10px; }
+  .pd__wish { width: 48px; height: 48px; }
+}
