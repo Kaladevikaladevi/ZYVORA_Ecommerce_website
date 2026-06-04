@@ -33,7 +33,8 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://zyvora-ecommerce-website.vercel.app"
+  "https://zyvora-ecommerce-website.vercel.app",
+  "https://zyvora-ecommerce-website-7lsupcyxh-kaladevis-projects.vercel.app"
 ];
 
 app.use(
