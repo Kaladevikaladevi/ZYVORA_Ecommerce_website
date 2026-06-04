@@ -34,20 +34,25 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://zyvora-ecommerce-website.vercel.app",
-  "https://zyvora-ecommerce-website-7lsupcyxh-kaladevis-projects.vercel.app"
+  /\.vercel\.app$/   // ✅ allow all Vercel previews
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow tools like Postman / server-to-server
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        allowedOrigins.some((o) =>
+          o instanceof RegExp ? o.test(origin) : false
+        );
+
+      if (isAllowed) {
         return callback(null, true);
       }
 
-      return callback(new Error("CORS blocked for origin: " + origin));
+      return callback(new Error("CORS blocked: " + origin));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
