@@ -1,7 +1,4 @@
-// Load env vars FIRST. Using the side-effect import (instead of a body-level
-// dotenv.config()) guarantees env is populated before the imports below are
-// evaluated — ESM evaluates all imports in source order before any body code,
-// so config/cloudinary.js must not be imported before this runs.
+// Load env vars FIRST
 import 'dotenv/config';
 
 import express from 'express';
@@ -32,25 +29,43 @@ await connectDB();
 
 const app = express();
 
-// ---- Security & parsing middleware ----
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-import cors from "cors";
+/* ---------------- CORS FIX (IMPORTANT) ---------------- */
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://zyvora-ecommerce-website.vercel.app"
+];
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://zyvora-ecommerce-website.vercel.app"
-    ],
+    origin: function (origin, callback) {
+      // allow tools like Postman / server-to-server
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS blocked for origin: " + origin));
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
+
+/* ---------------- SECURITY MIDDLEWARE ---------------- */
+
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
-app.use(mongoSanitize()); // strip $ / . from req payloads (NoSQL injection)
-app.use(xss()); // sanitize user input against stored XSS
-app.use(hpp()); // protect against HTTP param pollution
+app.use(mongoSanitize());
+app.use(xss());
+app.use(hpp());
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
@@ -58,12 +73,18 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use('/api', apiLimiter);
 
-// ---- Health check ----
+/* ---------------- HEALTH CHECK ---------------- */
+
 app.get('/api/health', (req, res) =>
-  res.json({ success: true, status: 'Zyvora API is running', time: new Date() })
+  res.json({
+    success: true,
+    status: 'Zyvora API is running',
+    time: new Date()
+  })
 );
 
-// ---- Routes ----
+/* ---------------- ROUTES ---------------- */
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
@@ -74,18 +95,23 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
 
-// ---- Errors ----
+/* ---------------- ERROR HANDLING ---------------- */
+
 app.use(notFound);
 app.use(errorHandler);
 
+/* ---------------- SERVER ---------------- */
+
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () =>
   console.log(
     `🚀 Zyvora API running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
   )
 );
 
-// Crash-safety: log unhandled rejections instead of dying silently.
+/* ---------------- CRASH SAFETY ---------------- */
+
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err.message);
 });
