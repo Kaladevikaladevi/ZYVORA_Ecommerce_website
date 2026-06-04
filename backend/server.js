@@ -34,9 +34,14 @@ const app = express();
 
 // ---- Security & parsing middleware ----
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+import cors from "cors";
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: [
+      "http://localhost:5173",
+      "https://zyvora-ecommerce-website.vercel.app"
+    ],
     credentials: true,
   })
 );
