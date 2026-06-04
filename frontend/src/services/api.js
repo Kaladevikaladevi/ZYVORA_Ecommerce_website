@@ -1,15 +1,19 @@
 import axios from 'axios';
 
 /**
- * Central Axios instance. In dev, Vite proxies /api to the Express backend.
- * `withCredentials` lets the HttpOnly auth cookie ride along automatically.
+ * Axios instance for Zyvora backend
  */
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://zyvora-ecommerce-website.onrender.com/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
-// Normalize error messages so callers can rely on a consistent shape.
+// Global error handler
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -17,7 +21,11 @@ api.interceptors.response.use(
       error.response?.data?.message ||
       error.message ||
       'Something went wrong. Please try again.';
-    return Promise.reject({ ...error, message });
+
+    return Promise.reject({
+      ...error,
+      message,
+    });
   }
 );
 
