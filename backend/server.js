@@ -1,4 +1,3 @@
-// Load env vars FIRST
 import 'dotenv/config';
 
 import express from 'express';
@@ -29,98 +28,87 @@ await connectDB();
 
 const app = express();
 
-// Trust reverse proxy for cookie security in production (Render)
+/* ================= TRUST PROXY (IMPORTANT FOR VERCEL/RENDER) ================= */
 app.set('trust proxy', 1);
 
-/* ---------------- CORS FIX (IMPORTANT) ---------------- */
+/* ================= CORS FIX ================= */
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://zyvora-ecommerce-website.vercel.app",
-  /\.vercel\.app$/   // ✅ allow all Vercel previews
+  "https://zyvora-ecommerce-website.vercel.app"
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    const isAllowed =
-      allowedOrigins.includes(origin) ||
-      allowedOrigins.some((o) =>
-        o instanceof RegExp ? o.test(origin) : false
-      );
-
-    if (isAllowed) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    return callback(new Error("CORS blocked: " + origin));
+    return callback(new Error(`CORS blocked: ${origin}`));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 };
 
 app.use(cors(corsOptions));
-
-// Handle preflight requests with correct CORS settings
 app.options("*", cors(corsOptions));
 
-/* ---------------- SECURITY MIDDLEWARE ---------------- */
+/* ================= SECURITY ================= */
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
 }
 
-app.use('/api', apiLimiter);
+/* ================= RATE LIMIT ================= */
+app.use("/api", apiLimiter);
 
-/* ---------------- HEALTH CHECK ---------------- */
-
-app.get('/api/health', (req, res) =>
+/* ================= HEALTH CHECK ================= */
+app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    status: 'Zyvora API is running',
-    time: new Date()
-  })
-);
+    message: "Zyvora API is running",
+    time: new Date(),
+  });
+});
 
-/* ---------------- ROUTES ---------------- */
+/* ================= ROUTES ================= */
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/admin', adminRoutes);
+// IMPORTANT: THESE MUST MATCH FRONTEND CALLS
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/admin", adminRoutes);
 
-/* ---------------- ERROR HANDLING ---------------- */
-
+/* ================= ERROR HANDLING ================= */
 app.use(notFound);
 app.use(errorHandler);
 
-/* ---------------- SERVER ---------------- */
-
+/* ================= SERVER ================= */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () =>
+app.listen(PORT, () => {
   console.log(
-    `🚀 Zyvora API running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
-  )
-);
+    `🚀 Zyvora API running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`
+  );
+});
 
-/* ---------------- CRASH SAFETY ---------------- */
-
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err.message);
+/* ================= CRASH SAFETY ================= */
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err.message);
 });
