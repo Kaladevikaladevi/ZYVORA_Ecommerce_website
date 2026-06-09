@@ -35,14 +35,19 @@ app.set('trust proxy', 1);
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://zyvora-ecommerce-website.vercel.app"
+  "https://zyvora-ecommerce-website.vercel.app",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow Postman, mobile apps, server-to-server requests
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    // Allow specific domains + all Vercel preview deployments
+    if (
+      allowedOrigins.includes(origin) ||
+      /\.vercel\.app$/.test(origin)
+    ) {
       return callback(null, true);
     }
 
@@ -50,7 +55,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
