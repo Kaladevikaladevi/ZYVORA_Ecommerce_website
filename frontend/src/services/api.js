@@ -8,27 +8,27 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   'https://zyvora-ecommerce-website.onrender.com/api';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+const api = axios.create({
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
-// Request interceptor to attach JWT token to Authorization header (fail-safe for cross-site cookie blocking)
+// Attach JWT token if available
 api.interceptors.request.use(
   (config) => {
     try {
       const stored = JSON.parse(localStorage.getItem('zyvora_user'));
+
       if (stored?.token) {
         config.headers.Authorization = `Bearer ${stored.token}`;
       }
-    } catch (e) {
-      // Ignore JSON parsing errors
+    } catch (err) {
+      console.error(err);
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Global error handler
