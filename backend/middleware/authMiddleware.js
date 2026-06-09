@@ -5,46 +5,63 @@ import { asyncHandler } from './errorMiddleware.js';
 export const protect = asyncHandler(async (req, res, next) => {
   let token;
 
-  // Get token from cookie OR header
+  // 1. Get token from cookie OR Authorization header
   if (req.cookies?.token) {
     token = req.cookies.token;
-  } else if (req.headers.authorization?.startsWith('Bearer ')) {
+  }
+
+  if (!token && req.headers.authorization?.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
 
+  // 2. If no token
   if (!token) {
-    res.status(401);
-    throw new Error('Not authorized — please log in');
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized — please log in',
+    });
   }
 
   try {
+    // 3. Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    // 4. Get user
     const user = await User.findById(decoded.id).select('-password');
 
     if (!user) {
-      res.status(401);
-      throw new Error('User no longer exists');
+      return res.status(401).json({
+        success: false,
+        message: 'User no longer exists',
+      });
     }
 
+    // 5. Blocked user check
     if (user.isBlocked) {
-      res.status(403);
-      throw new Error('Your account has been blocked. Contact support.');
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been blocked. Contact support.',
+      });
     }
 
+    // 6. Attach user
     req.user = user;
     next();
   } catch (error) {
-    res.status(401);
-    throw new Error('Not authorized — invalid or expired token');
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized — invalid or expired token',
+    });
   }
 });
 
 export const admin = (req, res, next) => {
-  if (req.user?.role === 'admin') {
+  if (req.user && req.user.role === 'admin') {
     return next();
   }
 
-  res.status(403);
-  throw new Error('Admin access required');
+  return res.status(403).json({
+    success: false,
+    message: 'Admin access required',
+  });
 };

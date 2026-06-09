@@ -9,7 +9,7 @@ export default defineConfig({
     proxy: {
       // Forward API calls to the Express backend during development.
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://zyvora-ecommerce-website.onrender.com',
         changeOrigin: true,
       },
     },
