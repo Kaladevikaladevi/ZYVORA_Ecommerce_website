@@ -12,6 +12,7 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
   const { user, loading, error } = useSelector((s) => s.auth);
 
   const [form, setForm] = useState({ email: '', password: '' });
@@ -23,7 +24,12 @@ export default function Login() {
     if (user) navigate(from, { replace: true });
   }, [user, from, navigate]);
 
-  useEffect(() => () => dispatch(clearError()), [dispatch]);
+  // FIXED cleanup
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -33,10 +39,12 @@ export default function Login() {
   return (
     <div className="auth">
       <Meta title="Login" />
+
       <AuthAside
         title={<>Welcome back to <em>luxury</em></>}
         text="Sign in to continue your journey through the world of Zyvora."
       />
+
       <div className="auth__form-wrap">
         <form className="auth__form" onSubmit={submit}>
           <h1>Sign In</h1>
@@ -47,11 +55,12 @@ export default function Login() {
           <div className="field">
             <label>Email Address</label>
             <input
-              className="input"
               type="email"
+              className="input"
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="you@example.com"
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
               required
             />
           </div>
@@ -59,11 +68,12 @@ export default function Login() {
           <div className="field auth__pw">
             <label>Password</label>
             <input
-              className="input"
               type={show ? 'text' : 'password'}
+              className="input"
               value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder="••••••••"
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
               required
             />
             <button type="button" onClick={() => setShow((s) => !s)}>

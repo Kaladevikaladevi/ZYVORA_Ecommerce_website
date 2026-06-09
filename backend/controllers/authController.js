@@ -39,15 +39,16 @@ export const register = asyncHandler(async (req, res) => {
       : 'user';
 
   const user = await User.create({ name, email, password, phone, role });
-  generateToken(res, user._id);
+  const token = generateToken(res, user._id);
 
-  await sendEmail({
+  // Send welcome email asynchronously in the background so it doesn't block the response
+  sendEmail({
     to: user.email,
     subject: 'Welcome to Zyvora ✨',
     html: welcomeEmail(user.name),
   });
 
-  res.status(201).json({ success: true, user: sanitizeUser(user) });
+  res.status(201).json({ success: true, token, user: sanitizeUser(user) });
 });
 
 // @desc    Login user
@@ -75,8 +76,8 @@ export const login = asyncHandler(async (req, res) => {
     throw new Error('Your account has been blocked. Contact support.');
   }
 
-  generateToken(res, user._id);
-  res.json({ success: true, user: sanitizeUser(user) });
+  const token = generateToken(res, user._id);
+  res.json({ success: true, token, user: sanitizeUser(user) });
 });
 
 // @desc    Logout user
@@ -161,6 +162,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.resetPasswordExpire = undefined;
   await user.save();
 
-  generateToken(res, user._id);
-  res.json({ success: true, message: 'Password reset successful' });
+  const token = generateToken(res, user._id);
+  res.json({ success: true, token, message: 'Password reset successful' });
 });

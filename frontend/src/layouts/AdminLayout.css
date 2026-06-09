@@ -73,6 +73,7 @@
 
 .admin__content { padding: 28px; }
 .admin__burger, .admin__close-mobile { display: none; font-size: 20px; color: var(--ink); }
+.admin__close-btn { display: none; }
 .admin__overlay { display: none; }
 
 @media (max-width: 900px) {
@@ -80,6 +81,23 @@
   .admin__side.is-open { transform: translateX(0); }
   .admin__main { margin-left: 0; }
   .admin__burger { display: grid; place-items: center; }
+  .admin__close-btn {
+    display: grid;
+    place-items: center;
+    background: none;
+    border: none;
+    color: #c9b3c4;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .admin__close-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
   .admin__overlay { display: block; position: fixed; inset: 0; background: rgba(42,1,35,0.45); z-index: 90; }
   .admin__content { padding: 18px; }
 }

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   FaTachometerAlt,
@@ -28,8 +28,14 @@ const nav = [
 export default function AdminLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSelector((s) => s.auth);
   const [open, setOpen] = useState(false);
+
+  // Auto-close sidebar on route change (for mobile viewports)
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -43,6 +49,9 @@ export default function AdminLayout() {
         <div className="admin__brand">
           <Link to="/admin">ZYVORA</Link>
           <span>Admin</span>
+          <button className="admin__close-btn" onClick={() => setOpen(false)} aria-label="Close menu">
+            <FaTimes />
+          </button>
         </div>
 
         <nav className="admin__nav">
@@ -54,7 +63,6 @@ export default function AdminLayout() {
               className={({ isActive }) =>
                 `admin__link ${isActive ? 'is-active' : ''}`
               }
-              onClick={() => setOpen(false)}
             >
               {n.icon} {n.label}
             </NavLink>
@@ -79,16 +87,9 @@ export default function AdminLayout() {
             className="admin__burger"
             onClick={() => setOpen(true)}
             aria-label="Open menu"
+            style={{ display: open ? 'none' : 'grid' }}
           >
             <FaBars />
-          </button>
-          <button
-            className="admin__close-mobile"
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-            style={{ display: open ? 'grid' : 'none' }}
-          >
-            <FaTimes />
           </button>
           <div className="spacer" />
           <div className="admin__user">

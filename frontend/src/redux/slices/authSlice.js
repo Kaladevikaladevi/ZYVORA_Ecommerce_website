@@ -14,7 +14,8 @@ export const register = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post('/auth/register', data);
-      return res.data.user;
+      const { user, token } = res.data;
+      return { ...user, token };
     } catch (e) {
       return rejectWithValue(e.message);
     }
@@ -26,7 +27,8 @@ export const login = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post('/auth/login', data);
-      return res.data.user;
+      const { user, token } = res.data;
+      return { ...user, token };
     } catch (e) {
       return rejectWithValue(e.message);
     }
@@ -82,8 +84,9 @@ const authSlice = createSlice({
       .addCase(loadUser.pending, (s) => { s.initializing = true; })
       .addCase(loadUser.fulfilled, (s, a) => {
         s.initializing = false;
-        s.user = a.payload;
-        localStorage.setItem('zyvora_user', JSON.stringify(a.payload));
+        const token = s.user?.token || stored?.token;
+        s.user = { ...a.payload, token };
+        localStorage.setItem('zyvora_user', JSON.stringify(s.user));
       })
       .addCase(loadUser.rejected, (s) => {
         s.initializing = false;

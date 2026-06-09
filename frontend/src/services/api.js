@@ -13,6 +13,24 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Request interceptor to attach JWT token to Authorization header (fail-safe for cross-site cookie blocking)
+api.interceptors.request.use(
+  (config) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('zyvora_user'));
+      if (stored?.token) {
+        config.headers.Authorization = `Bearer ${stored.token}`;
+      }
+    } catch (e) {
+      // Ignore JSON parsing errors
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Global error handler
 api.interceptors.response.use(
   (response) => response,

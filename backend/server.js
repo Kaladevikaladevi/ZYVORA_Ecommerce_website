@@ -29,6 +29,9 @@ await connectDB();
 
 const app = express();
 
+// Trust reverse proxy for cookie security in production (Render)
+app.set('trust proxy', 1);
+
 /* ---------------- CORS FIX (IMPORTANT) ---------------- */
 
 const allowedOrigins = [
@@ -37,31 +40,31 @@ const allowedOrigins = [
   /\.vercel\.app$/   // ✅ allow all Vercel previews
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
 
-      const isAllowed =
-        allowedOrigins.includes(origin) ||
-        allowedOrigins.some((o) =>
-          o instanceof RegExp ? o.test(origin) : false
-        );
+    const isAllowed =
+      allowedOrigins.includes(origin) ||
+      allowedOrigins.some((o) =>
+        o instanceof RegExp ? o.test(origin) : false
+      );
 
-      if (isAllowed) {
-        return callback(null, true);
-      }
+    if (isAllowed) {
+      return callback(null, true);
+    }
 
-      return callback(new Error("CORS blocked: " + origin));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+    return callback(new Error("CORS blocked: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-// Handle preflight requests
-app.options("*", cors());
+app.use(cors(corsOptions));
+
+// Handle preflight requests with correct CORS settings
+app.options("*", cors(corsOptions));
 
 /* ---------------- SECURITY MIDDLEWARE ---------------- */
 
